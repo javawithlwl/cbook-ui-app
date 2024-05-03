@@ -4,8 +4,37 @@ idContactList.innerHTML = 'Contact list will be displayed here...';
 //const basePath = "http://localhost:8080";
 const basePath = "https://cbook-server-api.onrender.com";
 
+async function login() {
+    const username = 'charan';
+    const password = 'charan@123';
+    const loginData = {
+        'username': username,
+        'password': password
+    };
+    fetch(`${basePath}/auth/login`, {
+        'headers': {
+            'Content-Type': 'application/json'
+        },
+        'method': 'POST',
+         'body': JSON.stringify(loginData)
+    }).then(response => {
+        return response.json().then(data => {
+            let token = data["token"];
+            localStorage.setItem('token', token);
+        });
+    });
+}
 const getContacts = async () => {
-    const response = await fetch(`${basePath}/api/contact/all`);
+    await login();
+    // fetch method with jwt token
+    const response = await fetch(
+        `${basePath}/api/contact/all`,{
+        'headers': {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        },
+        'method': 'GET'
+    });
     const contacts = await response.json();
     return contacts;
 }
